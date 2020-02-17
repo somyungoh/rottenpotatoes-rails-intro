@@ -15,8 +15,22 @@ class MoviesController < ApplicationController
 
   def index
     # @movies = Movie.all
-    # @movies = Movie.order(sort_column + " " + sort_direction)
-    @movies = Movie.order(sort_column)
+   
+    @all_ratings = ['G','PG','PG-13','R']
+    
+    @movies = Movie.all
+    
+    if params[:ratings]
+      @movies = Movie.where(rating: params[:ratings].keys)
+    #elsif
+    #  @movies = Movie.all
+    end
+    
+    if params[:sort]
+      @movies = Movie.order(sort_column)
+    end
+    
+    #@movies = Movie.order(sort_column)
   end
 
   def new
@@ -51,6 +65,6 @@ class MoviesController < ApplicationController
   
   # sort by title
   def sort_column
-    Movie.column_names.include?(params[:sort]) ? params[:sort] : "title"
+    Movie.column_names.include?(params[:sort]) ? params[:sort] : nil
   end
 end
