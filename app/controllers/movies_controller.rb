@@ -1,5 +1,8 @@
 class MoviesController < ApplicationController
 
+  # let helper know these private methods
+  helper_method :sort_column
+
   def movie_params
     params.require(:movie).permit(:title, :rating, :description, :release_date)
   end
@@ -11,7 +14,9 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    # @movies = Movie.all
+    # @movies = Movie.order(sort_column + " " + sort_direction)
+    @movies = Movie.order(sort_column)
   end
 
   def new
@@ -39,7 +44,13 @@ class MoviesController < ApplicationController
     @movie = Movie.find(params[:id])
     @movie.destroy
     flash[:notice] = "Movie '#{@movie.title}' deleted."
-    redirect_to movies_path
+    redirect_to movies_path # directs to thw show view
   end
 
+  private
+  
+  # sort by title
+  def sort_column
+    Movie.column_names.include?(params[:sort]) ? params[:sort] : "title"
+  end
 end
