@@ -2,7 +2,8 @@ class MoviesController < ApplicationController
 
   # let helper know these private methods
   helper_method :sort_column
-
+  
+  
   def movie_params
     params.require(:movie).permit(:title, :rating, :description, :release_date)
   end
@@ -14,23 +15,29 @@ class MoviesController < ApplicationController
   end
 
   def index
-    # @movies = Movie.all
-   
+    
     @all_ratings = ['G','PG','PG-13','R']
     
-    @movies = Movie.all
-    
+    session[:movies] = Movie.all
+  
     if params[:ratings]
-      @movies = Movie.where(rating: params[:ratings].keys)
-    #elsif
-    #  @movies = Movie.all
+      session[:movies]  = session[:movies].where(rating: params[:ratings].keys)
+      session[:ratings] = params[:ratings]
+    elsif session[:ratings]
+      params[:ratings] = session[:ratings]
+      session[:movies]  = session[:movies].where(rating: params[:ratings].keys)
     end
     
     if params[:sort]
-      @movies = Movie.order(sort_column)
+      session[:movies] = session[:movies].order(sort_column)
+      session[:sort] = params[:sort]
+    elsif session[:sort]
+      params[:sort] = session[:sort]
+      session[:movies] = session[:movies].order(sort_column)
     end
     
-    #@movies = Movie.order(sort_column)
+    @movies = session[:movies]
+    
   end
 
   def new
